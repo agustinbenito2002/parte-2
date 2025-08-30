@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import Filter from './components/Filter'
+import PersonForm from './components/PersonForm'
+import Persons from './components/Persons'
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -7,7 +10,7 @@ const App = () => {
   ])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
-  const [filter, setFilter] = useState('') // Nuevo estado para el filtro
+  const [filter, setFilter] = useState('')
 
   // Maneja cambios en el input de nombre
   const handleNameChange = (event) => {
@@ -24,7 +27,7 @@ const App = () => {
     setFilter(event.target.value)
   }
 
-  // Maneja el submit del formulario
+  // Maneja la adición de una nueva persona
   const addPerson = (event) => {
     event.preventDefault()
 
@@ -38,21 +41,17 @@ const App = () => {
       return
     }
 
-    // Creamos un nuevo objeto persona
     const personObject = {
       name: newName,
       number: newNumber
     }
 
-    // Actualizamos el estado
     setPersons(persons.concat(personObject))
-
-    // Limpiamos los inputs
     setNewName('')
     setNewNumber('')
   }
 
-  // Filtramos las personas según el término de búsqueda (insensible a mayúsculas)
+  // Filtramos las personas según el término de búsqueda
   const personsToShow = persons.filter(person =>
     person.name.toLowerCase().includes(filter.toLowerCase())
   )
@@ -61,32 +60,24 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
 
-      {/* Campo de búsqueda */}
-      <div>
-        filter shown with <input value={filter} onChange={handleFilterChange} />
-      </div>
+      {/* Filtro de búsqueda */}
+      <Filter filter={filter} handleFilterChange={handleFilterChange} />
 
-      <h2>add a new</h2>
-      <form onSubmit={addPerson}>
-        <div>
-          name: <input value={newName} onChange={handleNameChange} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <h3>Add a new</h3>
 
-      <h2>Numbers</h2>
-      <ul>
-        {personsToShow.map((person, index) => (
-          <li key={index}>
-            {person.name} {person.number}
-          </li>
-        ))}
-      </ul>
+      {/* Formulario para agregar personas */}
+      <PersonForm
+        addPerson={addPerson}
+        newName={newName}
+        handleNameChange={handleNameChange}
+        newNumber={newNumber}
+        handleNumberChange={handleNumberChange}
+      />
+
+      <h3>Numbers</h3>
+
+      {/* Lista de personas */}
+      <Persons persons={personsToShow} />
     </div>
   )
 }
