@@ -2,26 +2,34 @@ import { useState } from 'react'
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas' },
-    { name: 'Ada Lovelace' }
+    { name: 'Arto Hellas' }
   ])
   const [newName, setNewName] = useState('')
 
-  // Manejar el cambio en el input
+  // Maneja cambios en el input
   const handleNameChange = (event) => {
     setNewName(event.target.value)
   }
 
-  // Manejar el submit del formulario
+  // Maneja el submit del formulario
   const addPerson = (event) => {
     event.preventDefault()
 
-    // Creamos un nuevo objeto persona
+    // Verificamos si el nombre ya existe en la lista
+    const nameExists = persons.some(
+      person => person.name.toLowerCase() === newName.toLowerCase()
+    )
+
+    if (nameExists) {
+      alert(`${newName} is already added to phonebook`)
+      return
+    }
+
+    // Si no existe, lo agregamos
     const nameObject = {
       name: newName
     }
 
-    // Actualizamos el estado, agregando la nueva persona
     setPersons(persons.concat(nameObject))
     setNewName('') // Limpiamos el input
   }
@@ -44,12 +52,6 @@ const App = () => {
           <li key={index}>{person.name}</li>
         ))}
       </ul>
-
-      {/* Temporal: mostramos el estado para depuración */}
-      <div>
-        <p>Estado actual: {JSON.stringify(persons)}</p>
-        <p>Nuevo nombre: {newName}</p>
-      </div>
     </div>
   )
 }
