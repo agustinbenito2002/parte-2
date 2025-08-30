@@ -2,20 +2,26 @@ import { useState } from 'react'
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas' }
+    { name: 'Arto Hellas', number: '040-1234567' }
   ])
   const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
 
-  // Maneja cambios en el input
+  // Maneja cambios en el input de nombre
   const handleNameChange = (event) => {
     setNewName(event.target.value)
+  }
+
+  // Maneja cambios en el input de número
+  const handleNumberChange = (event) => {
+    setNewNumber(event.target.value)
   }
 
   // Maneja el submit del formulario
   const addPerson = (event) => {
     event.preventDefault()
 
-    // Verificamos si el nombre ya existe en la lista
+    // Verificamos si el nombre ya existe
     const nameExists = persons.some(
       person => person.name.toLowerCase() === newName.toLowerCase()
     )
@@ -25,13 +31,18 @@ const App = () => {
       return
     }
 
-    // Si no existe, lo agregamos
-    const nameObject = {
-      name: newName
+    // Creamos un nuevo objeto persona con nombre y número
+    const personObject = {
+      name: newName,
+      number: newNumber
     }
 
-    setPersons(persons.concat(nameObject))
-    setNewName('') // Limpiamos el input
+    // Actualizamos el estado
+    setPersons(persons.concat(personObject))
+
+    // Limpiamos los inputs
+    setNewName('')
+    setNewNumber('')
   }
 
   return (
@@ -42,6 +53,9 @@ const App = () => {
           name: <input value={newName} onChange={handleNameChange} />
         </div>
         <div>
+          number: <input value={newNumber} onChange={handleNumberChange} />
+        </div>
+        <div>
           <button type="submit">add</button>
         </div>
       </form>
@@ -49,7 +63,9 @@ const App = () => {
       <h2>Numbers</h2>
       <ul>
         {persons.map((person, index) => (
-          <li key={index}>{person.name}</li>
+          <li key={index}>
+            {person.name} {person.number}
+          </li>
         ))}
       </ul>
     </div>
