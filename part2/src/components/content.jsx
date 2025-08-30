@@ -1,11 +1,12 @@
 import Part from './Part';
 
 const Content = ({ parts }) => {
-  // Calculamos el total de ejercicios con reduce
+  // Usamos reduce para sumar todos los ejercicios
   const totalExercises = parts.reduce((sum, part) => sum + part.exercises, 0);
 
   return (
     <div>
+      {/* Mostramos cada parte */}
       {parts.map((part) => (
         <Part key={part.id} name={part.name} exercises={part.exercises} />
       ))}
