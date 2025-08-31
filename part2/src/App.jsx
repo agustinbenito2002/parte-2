@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import personsService from "./services/persons";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
-import Persons from "./components/Persons1";
+import Persons from "./components/Persons";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -10,19 +10,25 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
 
-  // Cargar datos del servidor al iniciar
+  // Obtener contactos desde el backend al iniciar
   useEffect(() => {
-    personsService.getAll().then(initialPersons => {
-      setPersons(initialPersons);
-    });
+    personsService
+      .getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons);
+      })
+      .catch(error => {
+        console.error("Error al cargar contactos:", error);
+      });
   }, []);
 
+  // Agregar un nuevo contacto
   const addPerson = event => {
     event.preventDefault();
-    const existingPerson = persons.find(p => p.name === newName);
 
+    const existingPerson = persons.find(p => p.name === newName);
     if (existingPerson) {
-      alert(`${newName} ya está agregado a la agenda`);
+      alert(`${newName} ya está en la agenda`);
       return;
     }
 
@@ -36,8 +42,23 @@ const App = () => {
         setNewNumber("");
       })
       .catch(error => {
-        console.error("Error al agregar persona:", error);
+        console.error("Error al agregar contacto:", error);
       });
+  };
+
+  // Eliminar un contacto
+  const deletePerson = id => {
+    const person = persons.find(p => p.id === id);
+    if (window.confirm(`¿Seguro que deseas eliminar a ${person.name}?`)) {
+      personsService
+        .remove(id)
+        .then(() => {
+          setPersons(persons.filter(p => p.id !== id));
+        })
+        .catch(error => {
+          console.error("Error al eliminar contacto:", error);
+        });
+    }
   };
 
   const handleNameChange = e => setNewName(e.target.value);
@@ -63,7 +84,7 @@ const App = () => {
       />
 
       <h3>Numbers</h3>
-      <Persons persons={personsToShow} />
+      <Persons persons={personsToShow} deletePerson={deletePerson} />
     </div>
   );
 };
