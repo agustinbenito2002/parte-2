@@ -1,80 +1,71 @@
-import { useState, useEffect } from 'react'
-import axios from 'axios'
-import Filter from './components/Filter'
-import PersonForm from './components/PersonForm'
-import Persons from './components/Persons'
+import { useState, useEffect } from "react";
+import personsService from "./services/persons";
+import Filter from "./components/Filter";
+import PersonForm from "./components/PersonForm";
+import Persons from "./components/Persons1";
 
 const App = () => {
-  const [persons, setPersons] = useState([])
-  const [newName, setNewName] = useState('')
-  const [newNumber, setNewNumber] = useState('')
-  const [filter, setFilter] = useState('')
+  const [persons, setPersons] = useState([]);
+  const [newName, setNewName] = useState("");
+  const [newNumber, setNewNumber] = useState("");
+  const [filter, setFilter] = useState("");
 
-  // Cargar datos iniciales desde db.json
+  // Cargar datos del servidor al iniciar
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
-      })
-  }, [])
+    personsService.getAll().then(initialPersons => {
+      setPersons(initialPersons);
+    });
+  }, []);
 
-  const handleNameChange = (event) => setNewName(event.target.value)
-  const handleNumberChange = (event) => setNewNumber(event.target.value)
-  const handleFilterChange = (event) => setFilter(event.target.value)
+  const addPerson = event => {
+    event.preventDefault();
+    const existingPerson = persons.find(p => p.name === newName);
 
-  const addPerson = (event) => {
-    event.preventDefault()
-
-    const nameExists = persons.some(
-      person => person.name.toLowerCase() === newName.toLowerCase()
-    )
-
-    if (nameExists) {
-      alert(`${newName} is already added to phonebook`)
-      return
+    if (existingPerson) {
+      alert(`${newName} ya está agregado a la agenda`);
+      return;
     }
 
-    const newPerson = {
-      name: newName,
-      number: newNumber
-    }
+    const newPerson = { name: newName, number: newNumber };
 
-    // Enviar la nueva persona al servidor
-    axios
-      .post('http://localhost:3001/persons', newPerson)
-      .then(response => {
-        setPersons(persons.concat(response.data))
-        setNewName('')
-        setNewNumber('')
+    personsService
+      .create(newPerson)
+      .then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson));
+        setNewName("");
+        setNewNumber("");
       })
-  }
+      .catch(error => {
+        console.error("Error al agregar persona:", error);
+      });
+  };
 
-  const personsToShow = persons.filter(person =>
-    person.name.toLowerCase().includes(filter.toLowerCase())
-  )
+  const handleNameChange = e => setNewName(e.target.value);
+  const handleNumberChange = e => setNewNumber(e.target.value);
+  const handleFilterChange = e => setFilter(e.target.value);
+
+  const personsToShow = persons.filter(p =>
+    p.name.toLowerCase().includes(filter.toLowerCase())
+  );
 
   return (
     <div>
       <h2>Phonebook</h2>
-
-      <Filter filter={filter} handleFilterChange={handleFilterChange} />
+      <Filter value={filter} onChange={handleFilterChange} />
 
       <h3>Add a new</h3>
-
       <PersonForm
-        addPerson={addPerson}
+        onSubmit={addPerson}
         newName={newName}
-        handleNameChange={handleNameChange}
         newNumber={newNumber}
+        handleNameChange={handleNameChange}
         handleNumberChange={handleNumberChange}
       />
 
       <h3>Numbers</h3>
-
       <Persons persons={personsToShow} />
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
