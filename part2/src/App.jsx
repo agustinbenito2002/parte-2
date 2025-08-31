@@ -10,7 +10,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
 
-  // Obtener contactos desde el backend al iniciar
+  // Cargar contactos desde el backend
   useEffect(() => {
     personsService
       .getAll()
@@ -22,7 +22,7 @@ const App = () => {
       });
   }, []);
 
-  // Agregar un nuevo contacto
+  // Agregar nuevo contacto
   const addPerson = event => {
     event.preventDefault();
 
@@ -37,7 +37,7 @@ const App = () => {
     personsService
       .create(newPerson)
       .then(returnedPerson => {
-        setPersons(persons.concat(returnedPerson));
+        setPersons([...persons, returnedPerson]);
         setNewName("");
         setNewNumber("");
       })
@@ -46,10 +46,12 @@ const App = () => {
       });
   };
 
-  // Eliminar un contacto
+  // Eliminar contacto
   const deletePerson = id => {
     const person = persons.find(p => p.id === id);
-    if (window.confirm(`¿Seguro que deseas eliminar a ${person.name}?`)) {
+    const confirmDelete = window.confirm(`¿Deseas eliminar a ${person.name}?`);
+
+    if (confirmDelete) {
       personsService
         .remove(id)
         .then(() => {
@@ -90,3 +92,4 @@ const App = () => {
 };
 
 export default App;
+

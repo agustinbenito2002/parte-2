@@ -12,3 +12,4 @@ const Persons = ({ persons, deletePerson }) => {
 };
 
 export default Persons;
+
